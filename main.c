@@ -15,10 +15,7 @@ int g_firstrun = TRUE;
 
 int main(void) {
     TC = 0;
-<<<<<<< HEAD
     init_kernel();
-=======
->>>>>>> 08232c870af46f0f6457ec9f90946aff185bdb24
     
     return 0;
 }
