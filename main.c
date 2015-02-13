@@ -11,11 +11,10 @@
 #include "main.h"
 
 int g_mode = 0;
-int g_firstrun = 1;
+int g_firstrun = TRUE;
 
 int main(void) {
     TC = 0;
-    create_readylist();
     
     return 0;
 }
