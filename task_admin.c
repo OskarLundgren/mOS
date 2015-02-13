@@ -8,6 +8,7 @@
 
 #include "list_admin.h"
 #include "timing.h"
+#include "main.h"
 
 exception init_kernel(void){
     set_ticks(0);
