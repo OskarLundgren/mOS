@@ -47,8 +47,8 @@ exception create_task( void(*task_body)(), uint deadline ){
         return FAIL;
     }
     else{
-        newTCB->DeadLine = d;
-        newTCB->PC = body;
+        newTCB->DeadLine = deadline;
+        newTCB->PC = *task_body;
         newTCB->SP = &(newTCB->StackSeg[99]);
         if (g_mode == 0) {
             status = insert_readylist(newObj);

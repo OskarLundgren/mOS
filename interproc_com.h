@@ -12,5 +12,3 @@
 #include <stdio.h>
 
 #endif /* defined(__mOS__interproc_com__) */
-
-//Test-comment
