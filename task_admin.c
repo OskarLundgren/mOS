@@ -78,7 +78,7 @@ void terminate(void){
 	
 	
 	listobj *remove_object;
-	remove_object = extract_readylist();
+	remove_object = extract_ready_timer_list(g_readylist);
 	free(remove_object);
 	LoadContext();
 
