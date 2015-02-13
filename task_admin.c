@@ -8,6 +8,7 @@
 
 #include "list_admin.h"
 #include "timing.h"
+#include "main.h"
 
 exception init_kernel(void){
     set_ticks(0);
@@ -37,7 +38,7 @@ exception init_kernel(void){
     
 }
 
-exception create_task( void(*task_body)(), uint deadline ){
+exception create_task(  void (* body)(), uint d ){
     int status;
     TCB *newTCB = malloc(sizeof(TCB));
     listobj *newObj = malloc(sizeof(listobj));
@@ -50,8 +51,8 @@ exception create_task( void(*task_body)(), uint deadline ){
         newTCB->DeadLine = d;
         newTCB->PC = body;
         newTCB->SP = &(newTCB->StackSeg[99]);
-        if (g_mode == 0) {
-            status = insert_readylist(newObj);
+        if (g_mode == TRUE) {
+            status = insert_ready_timer_list(newObj);
             return status;
         }
         else{

@@ -33,8 +33,8 @@ exception send_wait( mailbox* mBox, void* pData ){
     //Enter row here to disable interrupt
     
     SaveContext();
-    if (g_firstrun) {
-        g_firstrun = 0;
+    if (g_firstrun == TRUE) {
+        g_firstrun = FALSE;
         if (<#condition#>) {
             <#statements#>
         }
