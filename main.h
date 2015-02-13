@@ -10,5 +10,7 @@
 #define mOS_main_h
 
 extern uint TC;
+extern g_mode;
+extern g_firstrun;
 
 #endif

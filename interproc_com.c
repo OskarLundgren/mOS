@@ -16,7 +16,5 @@ mailbox* create_mailbox( uint nMessages, uint nDataSize ){
     return newMb;
 }
 
-exception remove_mailbox( mailbox mb ){
-    free( mb );
     
 }

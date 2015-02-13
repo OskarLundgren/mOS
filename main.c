@@ -7,9 +7,15 @@
 //
 
 #include <stdio.h>
+#include "list_admin.h"
+#include "main.h"
 
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    printf("Hello, World!\n");
+int g_mode = 0;
+int g_firstrun = 1;
+
+int main(void) {
+    TC = 0;
+    create_readylist();
+    
     return 0;
 }
