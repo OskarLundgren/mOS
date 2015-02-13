@@ -7,3 +7,16 @@
 //
 
 #include "interproc_com.h"
+#include "kernel.h"
+
+mailbox* create_mailbox( uint nMessages, uint nDataSize ){
+    mailbox *newMb = malloc(sizeof(mailbox));
+    newMb->nMessages = nMessages;
+    newMb->nDataSize = nDataSize;
+    return newMb;
+}
+
+exception remove_mailbox( mailbox mb ){
+    free( mb );
+    
+}
