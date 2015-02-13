@@ -48,11 +48,19 @@ exception create_task( void(*task_body)(), uint deadline ){
         return FAIL;
     }
     else{
+<<<<<<< .merge_file_79K5ys
         newTCB->DeadLine = deadline;
         newTCB->PC = *task_body;
         newTCB->SP = &(newTCB->StackSeg[99]);
         if (g_mode == 0) {
             status = insert_waiting_ready_list(g_readylist,newObj);
+=======
+        newTCB->DeadLine = d;
+        newTCB->PC = body;
+        newTCB->SP = &(newTCB->StackSeg[99]);
+        if (g_mode == 0) {
+            status = insert_readylist(newObj);
+>>>>>>> .merge_file_Fu6j7H
             return status;
         }
         else{
@@ -61,11 +69,16 @@ exception create_task( void(*task_body)(), uint deadline ){
             SaveContext();
             if (g_firstrun == 1) {
                 g_firstrun = 0;
+<<<<<<< .merge_file_79K5ys
                 status = insert_waiting_ready_list(g_readylist, newObj);
+=======
+                status = insert_readylist(newObj);
+>>>>>>> .merge_file_Fu6j7H
                 LoadContext();
             }
         }
         return status;  
+<<<<<<< .merge_file_79K5ys
 	}
 }
 
@@ -73,12 +86,28 @@ exception create_task( void(*task_body)(), uint deadline ){
 /*void run(void){
  
 }*/
+=======
+  
+}
+
+
+void run(void){
+
+	
+
+}
+
+>>>>>>> .merge_file_Fu6j7H
 
 void terminate(void){
 	
 	
 	listobj *remove_object;
+<<<<<<< .merge_file_79K5ys
 	remove_object = extract_ready_timer_list(g_readylist);
+=======
+	remove_object = extract_readylist();
+>>>>>>> .merge_file_Fu6j7H
 	free(remove_object);
 	LoadContext();
 
