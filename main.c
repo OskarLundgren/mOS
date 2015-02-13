@@ -15,7 +15,7 @@ int g_firstrun = 1;
 
 int main(void) {
     TC = 0;
-    create_readylist();
+    init_kernel();
     
     return 0;
 }

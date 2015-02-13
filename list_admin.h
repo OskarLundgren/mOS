@@ -26,8 +26,9 @@ int insert_timerlist(listobj *insert_object, int nTCnt);
 int insert_waiting_ready_list(list *list, listobj *insert_object);
 
 /*Extracting objects from lists*/
-listobj* extract_timerlist(void);
-void extract_waitinglist(listobj *object);
-listobj* extract_readylist(void);
+
+exception extract_waitinglist(listobj *object);
+listobj* extract_ready_timer_list(list* list);
+
 
 #endif /* defined(__mOS_DSTII__linkedlist__) */

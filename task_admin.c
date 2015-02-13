@@ -52,7 +52,7 @@ exception create_task( void(*task_body)(), uint deadline ){
         newTCB->PC = *task_body;
         newTCB->SP = &(newTCB->StackSeg[99]);
         if (g_mode == 0) {
-            status = insert_readylist(newObj);
+            status = insert_waiting_ready_list(g_readylist,newObj);
             return status;
         }
         else{
@@ -61,21 +61,18 @@ exception create_task( void(*task_body)(), uint deadline ){
             SaveContext();
             if (g_firstrun == 1) {
                 g_firstrun = 0;
-                status = insert_readylist(newObj);
+                status = insert_waiting_ready_list(g_readylist, newObj);
                 LoadContext();
             }
         }
         return status;  
-  
+	}
 }
 
 
-void run(void){
-
-	
-
-}
-
+/*void run(void){
+ 
+}*/
 
 void terminate(void){
 	
