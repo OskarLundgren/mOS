@@ -9,27 +9,38 @@
 #include "list_admin.h"
 #include "timing.h"
 #include "main.h"
-#include "memwatch.h"
 
 exception init_kernel(void){
     set_ticks(0);
+	create_task(<#void (*body)()#>, <#uint d#>)
+	
 	g_readylist = create_list();
 	
 	if(g_readylist == NULL){
+	
 		return FAIL;
 	}
+	
     g_timerlist = create_list();
+	
 	if(g_timerlist == NULL){
 		return FAIL;
 	}
+	
     g_waitinglist = create_list();
+	
 	if(g_waitinglist == NULL){
+		
 		return FAIL;
 	}
+	
+	
 	return OK;
+		
+    
 }
 
-exception create_task(  void (* body)(), uint d ){
+exception create_task( void(*body)(), uint d ){
     int status;
     TCB *newTCB = malloc(sizeof(TCB));
     listobj *newObj = malloc(sizeof(listobj));
@@ -39,35 +50,66 @@ exception create_task(  void (* body)(), uint d ){
         return FAIL;
     }
     else{
+
         newTCB->DeadLine = d;
         newTCB->PC = body;
         newTCB->SP = &(newTCB->StackSeg[99]);
-        if (g_mode == TRUE) {
-            status = insert_ready_timer_list(newObj);
+        if (g_running_mode == 0) {
+            status = insert_waiting_ready_list(g_readylist,newObj);
+
+        newTCB->DeadLine = d;
+        newTCB->PC = body;
+        newTCB->SP = &(newTCB->StackSeg[99]);
+        if (g_running_mode == 0) {
+            status = insert_waiting_ready_list(g_readylist,newObj);
+
             return status;
         }
         else{
-            isr_off();
+            //Enter line here to disable interupts
+            
             SaveContext();
             if (g_firstrun == 1) {
                 g_firstrun = 0;
-                status = insert_readylist(newObj);
+
+                status = insert_waiting_ready_list(g_readylist, newObj);
+
+                status = insert_waiting_ready_list(g_readylist,newObj);
+
                 LoadContext();
             }
         }
-    return status;
+        return status;  
+
+	}
 }
+	return status;
+	
+}
+
 
 void run(void){
-    //Initialize interrupt timer
-    g_running_mode = TRUE;
-    isr_on();
-    LoadContext();
+
+	//Initialize interrupts
+	
+	
+	g_running_mode = TRUE;
+	isr_on();
+	LoadContext();
 }
 
+
+
 void terminate(void){
+	
+	
 	listobj *remove_object;
+
 	remove_object = extract_readylist();
+
+	remove_object = extract_readylist();
+
 	free(remove_object);
 	LoadContext();
+
 }
