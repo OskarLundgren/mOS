@@ -10,5 +10,9 @@
 #define __mOS__interproc_com__
 
 #include <stdio.h>
+#include "kernel.h"
+
+mailbox * create_mailbox(uint nMessages, uint ndataSize);
+
 
 #endif /* defined(__mOS__interproc_com__) */
