@@ -10,6 +10,8 @@
 #include "kernel.h"
 #include "main.h"
 
+int sw_firstrun = TRUE;
+
 mailbox* create_mailbox( uint nMessages, uint nDataSize ){
     mailbox *newMb = malloc(sizeof(mailbox));
     newMb->nMessages = nMessages;
@@ -30,13 +32,16 @@ exception remove_mailbox( mailbox * mBox){
 }
 
 exception send_wait( mailbox* mBox, void* pData ){
-    //Enter row here to disable interrupt
-    
+    isr_off();
     SaveContext();
-    if (g_firstrun == TRUE) {
-        g_firstrun = FALSE;
-        if (<#condition#>) {
-            <#statements#>
+    if (sw_firstrun) {
+        sw_firstrun = FALSE;
+        if (mBox->pHead->pNext != mBox->pTail) {
+            listobj * newListObj;
+            
+            //void	*memcpy(void *, const void *, size_t); ????
+            memcpy(mBox->pHead->pNext->pData, pData, mBox->nDataSize); //??
+            
         }
     }
 }
