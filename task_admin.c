@@ -12,6 +12,8 @@
 
 exception init_kernel(void){
     set_ticks(0);
+	create_task(<#void (*body)()#>, <#uint d#>)
+	
 	g_readylist = create_list();
 	
 	if(g_readylist == NULL){
