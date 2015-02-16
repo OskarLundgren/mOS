@@ -52,14 +52,14 @@ exception create_task( void(*body)(), uint d ){
         newTCB->DeadLine = d;
         newTCB->PC = body;
         newTCB->SP = &(newTCB->StackSeg[99]);
-        if (g_mode == 0) {
+        if (g_running_mode == 0) {
             status = insert_waiting_ready_list(g_readylist,newObj);
 
         newTCB->DeadLine = d;
         newTCB->PC = body;
         newTCB->SP = &(newTCB->StackSeg[99]);
-        if (g_mode == 0) {
-            status = insert_readylist(newObj);
+        if (g_running_mode == 0) {
+            status = insert_waiting_ready_list(g_readylist,newObj);
 
             return status;
         }
@@ -72,7 +72,7 @@ exception create_task( void(*body)(), uint d ){
 
                 status = insert_waiting_ready_list(g_readylist, newObj);
 
-                status = insert_readylist(newObj);
+                status = insert_waiting_ready_list(g_readylist,newObj);
 
                 LoadContext();
             }
@@ -88,8 +88,12 @@ exception create_task( void(*body)(), uint d ){
 
 void run(void){
 
+	//Initialize interrupts
 	
-
+	
+	g_running_mode = TRUE;
+	isr_on();
+	LoadContext();
 }
 
 
@@ -99,7 +103,7 @@ void terminate(void){
 	
 	listobj *remove_object;
 
-	remove_object = extract_ready_timer_list(g_readylist);
+	remove_object = extract_readylist();
 
 	remove_object = extract_readylist();
 

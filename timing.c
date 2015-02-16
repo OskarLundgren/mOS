@@ -52,7 +52,6 @@ uint deadline(void){
 void set_deadline( uint nNew ){
     isr_off();
     SaveContext();
-    if () {
-        <#statements#>
-    }
+    /*if () {
+    }*/
 }
