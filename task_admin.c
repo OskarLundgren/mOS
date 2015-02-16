@@ -9,6 +9,7 @@
 #include "list_admin.h"
 #include "timing.h"
 #include "main.h"
+#include "memwatch.h"
 
 exception init_kernel(void){
     set_ticks(0);
@@ -69,5 +70,4 @@ void terminate(void){
 	remove_object = extract_readylist();
 	free(remove_object);
 	LoadContext();
-
 }

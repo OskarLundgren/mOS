@@ -10,6 +10,7 @@
 #include "main.h"
 #include "kernel.h"
 #include "list_admin.h"
+#include "memwatch.h"
 
 int w_firstrun = TRUE;
 int sd_firstrun = TRUE;

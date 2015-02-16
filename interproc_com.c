@@ -9,6 +9,7 @@
 #include "interproc_com.h"
 #include "kernel.h"
 #include "main.h"
+#include "memwatch.h"
 
 int sw_firstrun = TRUE;
 
