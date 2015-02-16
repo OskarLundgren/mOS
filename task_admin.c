@@ -15,27 +15,17 @@ exception init_kernel(void){
 	g_readylist = create_list();
 	
 	if(g_readylist == NULL){
-	
 		return FAIL;
 	}
-	
     g_timerlist = create_list();
-	
 	if(g_timerlist == NULL){
 		return FAIL;
 	}
-	
     g_waitinglist = create_list();
-	
 	if(g_waitinglist == NULL){
-		
 		return FAIL;
 	}
-	
-	
 	return OK;
-		
-    
 }
 
 exception create_task(  void (* body)(), uint d ){
@@ -56,8 +46,7 @@ exception create_task(  void (* body)(), uint d ){
             return status;
         }
         else{
-            //Enter line here to disable interupts
-            
+            isr_off();
             SaveContext();
             if (g_firstrun == 1) {
                 g_firstrun = 0;
@@ -65,21 +54,17 @@ exception create_task(  void (* body)(), uint d ){
                 LoadContext();
             }
         }
-        return status;  
-  
+    return status;
 }
-
 
 void run(void){
-
-	
-
+    //Initialize interrupt timer
+    g_running_mode = TRUE;
+    isr_on();
+    LoadContext();
 }
 
-
 void terminate(void){
-	
-	
 	listobj *remove_object;
 	remove_object = extract_readylist();
 	free(remove_object);

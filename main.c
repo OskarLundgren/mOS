@@ -10,7 +10,7 @@
 #include "list_admin.h"
 #include "main.h"
 
-int g_mode = 0;
+int g_running_mode = FALSE;
 int g_firstrun = TRUE;
 
 int main(void) {
