@@ -63,8 +63,19 @@ exception insert_timerlist(listobj *insert_object, int TC){
     }
 }
 
+listobj * extract_timerlist(void){
+    listobj * returnObject;
+    if(g_timerlist->pHead->pNext == g_timerlist->pTail){
+        exit(0);
+    }
+    else{
+        returnObject = g_timerlist->pHead->pNext;
+        g_timerlist->pHead->pNext = g_timerlist->pHead->pNext->pNext;
+        return returnObject;
+    }
+}
+
 exception insert_waiting_ready_list(list *list, listobj * object){
-	
     //Checking if WAITING_LIST is empty
     if(list->pHead->pNext == list->pTail){
         list->pHead->pNext = object;
@@ -86,30 +97,31 @@ exception insert_waiting_ready_list(list *list, listobj * object){
 	return OK;
 }
 
-exception extract_waitinglist(listobj *object){
+void extract_waitinglist(listobj *object){
     int found = 0;
     listobj *tempObject = g_waitinglist->pHead;
     while ((tempObject->pNext != g_waitinglist->pTail) && (found != 1)) {
         tempObject = tempObject->pNext;
         if (tempObject == object) {
-			object->pPrevious->pNext = object->pNext;
-			object->pNext->pPrevious = object->pPrevious;
-			object->pNext = NULL;
-			object->pPrevious = NULL;
-			return OK;
+            found = 1;
         }
     }
-	return FAIL;
+    if (found == 1) {
+        object->pPrevious->pNext = object->pNext;
+        object->pNext->pPrevious = object->pPrevious;
+        object->pNext = NULL;
+        object->pPrevious = NULL;
+    }
 }
 
-listobj * extract_ready_timer_list(list* list){
+listobj * extract_readylist(void){
     listobj * returnObject;
-    if (list->pHead->pNext == list->pTail) {
+    if (g_readylist->pHead->pNext == g_readylist->pTail) {
         return NULL;
     }
     else{
-        returnObject = list->pHead->pNext;
-        list->pHead->pNext = returnObject->pNext;
+        returnObject = g_readylist->pHead->pNext;
+        g_readylist->pHead->pNext = returnObject->pNext;
         return returnObject;
     }
 }
