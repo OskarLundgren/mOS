@@ -9,7 +9,7 @@
 #ifndef mOS_main_h
 #define mOS_main_h
 
-extern uint TC;
+extern unsigned int TC;
 extern int g_running_mode;
 extern int g_firstrun;
 

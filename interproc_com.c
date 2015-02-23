@@ -67,14 +67,15 @@ exception send_wait(mailbox* mBox, void* pData){
 	SaveContext();
 	if (firstrun){
 		firstrun = FALSE;
-		if (mBox->nMessages < 0 && mBox->pHead->pNext != mBox->pTail) {
-			listobj * newListObj;
-			memcpy(mBox->pHead->pNext->pData, pData, mBox->nDataSize); //??
+		if (mBox->nBlockedMsg < 0 && mBox->pHead->pNext != mBox->pTail) {
+			memcpy(mBox->pHead->pNext->pData, pData, mBox->nDataSize);
 			listobj *recieving_task;
 			recieving_task = mBox->pHead->pNext->pBlock;
 			remove_message(mBox->pHead->pNext);
 			extract_waitinglist(recieving_task);
 			insert_waiting_ready_list(g_readylist,recieving_task);
+			mBox->nBlockedMsg++;
+			mBox->nMessages--;
 		}
 		
 		else{
@@ -89,20 +90,23 @@ exception send_wait(mailbox* mBox, void* pData){
 			message->pBlock = g_readylist->pHead->pNext;
 			mBox->pTail->pPrevious->pNext = message;
 			mBox->pTail->pPrevious = message;
-			mBox->nBlockedMsg++;
-			mBox->nMessages++;
+
 			listobj *sending_task;
 			sending_task = extract_readylist();
 			insert_waiting_ready_list(g_waitinglist, sending_task);
+			mBox->nMessages++;
+			mBox->nBlockedMsg--;
 		}
 		LoadContext();
 	}
 	
 	else{
 		
-		if(g_readylist->pHead->pNext->pTask->DeadLine <= TC){
+		if(g_waitinglist->pHead->pNext->pTask->DeadLine <= TC){
 			isr_off();
 			remove_message(mBox->pHead->pNext);
+			mBox->nMessages--;
+			mBox->nBlockedMsg++;
 			isr_on();
 			return DEADLINE_REACHED;
 		}
@@ -115,4 +119,108 @@ exception send_wait(mailbox* mBox, void* pData){
 	
 	return OK;
 }
+
+
+exception recieve_wait(mailbox *mBox, void *data){
+
+	volatile int firstrun = TRUE;
+	isr_off();
+	SaveContext();
+	
+	if(firstrun){
+		firstrun = FALSE;
+		
+		if(mBox->nBlockedMsg > 0 && mBox->pHead->pNext != mBox->pTail){
+			memcpy(mBox->pHead->pNext->pData, data, mBox->nDataSize);
+			remove_message(mBox->pHead->pNext);
+			mBox->nBlockedMsg--;
+			mBox->nMessages--;
+
+		
+		
+		if(mBox->nBlockedMsg < 0){
+			listobj *sending_task;
+			sending_task = mBox->pHead->pNext->pBlock;
+			extract_waitinglist(sending_task);
+			insert_waiting_ready_list(g_readylist, sending_task);
+			mBox->nBlockedMsg--;
+			mBox->nMessages++;
+	
+		
+		}
+		else{
+			free(mBox->pHead->pNext->pData);
+		
+		}
+	}
+	else{
+		listobj *recieving_task;
+		msg *message = malloc(sizeof(msg));
+		mBox->pHead->pNext = message;
+		recieving_task = extract_readylist();
+		insert_waiting_ready_list(g_waitinglist, recieving_task);
+	}
+	LoadContext();
+}
+	else{
+		if(g_waitinglist->pHead->pNext->pTask->DeadLine <= TC){
+			isr_off();
+			remove_message(mBox->pHead->pNext);
+			mBox->nMessages--;
+			mBox->nBlockedMsg++;
+			return DEADLINE_REACHED;
+		
+		}
+		else{
+			return OK;
+		}
+	
+	}
+	return OK;
+}
+
+
+
+exception send_no_wait(mailbox *mBox, void *data){
+	volatile int first_run = TRUE;
+	isr_off();
+	SaveContext();
+	
+	if(first_run){
+		first_run = FALSE;
+		
+		if(mBox->nMessages < 0 && mBox->pHead->pNext != mBox->pTail){
+			listobj *recieving_task;
+			memcpy(mBox->pHead->pNext->pData, data, mBox->nDataSize);
+			remove_message(mBox->pHead->pNext);
+			recieving_task = mBox->pHead->pNext->pBlock;
+			extract_waitinglist(recieving_task);
+			insert_waiting_ready_list(g_readylist, recieving_task);
+			
+		}
+	
+	}
+	
+}
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

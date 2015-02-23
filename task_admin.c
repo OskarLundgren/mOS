@@ -12,7 +12,7 @@
 
 exception init_kernel(void){
     set_ticks(0);
-	create_task(<#void (*body)()#>, <#uint d#>)
+
 	
 	g_readylist = create_list();
 	
@@ -90,7 +90,7 @@ exception create_task( void(*body)(), uint d ){
 
 void run(void){
 
-	//Initialize interrupts
+	//Timer0_Start();
 	
 	
 	g_running_mode = TRUE;

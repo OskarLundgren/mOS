@@ -103,18 +103,16 @@ void extract_waitinglist(listobj *object){
     while ((tempObject->pNext != g_waitinglist->pTail) && (found != 1)) {
         tempObject = tempObject->pNext;
         if (tempObject == object) {
-            found = 1;
+			object->pPrevious->pNext = object->pNext;
+			object->pNext->pPrevious = object->pPrevious;
+			object->pNext = NULL;
+			object->pPrevious = NULL;
         }
     }
-    if (found == 1) {
-        object->pPrevious->pNext = object->pNext;
-        object->pNext->pPrevious = object->pPrevious;
-        object->pNext = NULL;
-        object->pPrevious = NULL;
-    }
+
 }
 
-listobj * extract_readylist(void){
+listobj* extract_readylist(void){
     listobj * returnObject;
     if (g_readylist->pHead->pNext == g_readylist->pTail) {
         return NULL;
