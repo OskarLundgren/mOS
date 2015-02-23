@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "main.h"
+#include "memwatch.h"
 
 /** Variables **/
 list *g_readylist;

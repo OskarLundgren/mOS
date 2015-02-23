@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include "list_admin.h"
 #include "main.h"
+#include "memwatch.h"
 
 int g_running_mode = FALSE;
 int g_firstrun = TRUE;
