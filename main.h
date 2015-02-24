@@ -8,9 +8,12 @@
 
 #ifndef mOS_main_h
 #define mOS_main_h
+#include "kernel.h"
 
-extern unsigned int TC;
+
+extern int TC;
 extern int g_running_mode;
 extern int g_firstrun;
+extern TCB *running;
 
 #endif

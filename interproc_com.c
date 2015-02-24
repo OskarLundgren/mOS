@@ -13,6 +13,41 @@
 #include "list_admin.h"
 
 
+
+//mailbox struct with FIFO-implementation
+
+exception push_mailbox(mailbox *mBox, msg *message){
+	
+	if(mBox == NULL || message == NULL){
+	
+		return FAIL;
+	}
+
+	message->pPrevious = mBox->pHead;
+	message->pNext = mBox->pHead->pNext;
+	mBox->pHead->pNext->pPrevious = message;
+	mBox->pHead->pNext = message;
+	
+	return OK;
+}
+
+msg* pop_mailbox(mailbox *mBox){
+	
+	msg* target_message = mBox->pTail->pPrevious;
+	target_message->pPrevious->pNext = target_message->pNext;
+	mBox->pTail->pPrevious = target_message->pPrevious;
+	
+	target_message->pNext = NULL;
+	target_message->pPrevious = NULL;
+	
+	
+	return target_message;
+	
+	
+}
+
+
+
 void remove_message(msg *new_message){
 	
 	new_message->pPrevious->pNext = new_message->pNext;
@@ -42,7 +77,7 @@ mailbox* create_mailbox( uint nMessages, uint nDataSize ){
 		newMb->nBlockedMsg = 0;
 		newMb->pHead->pNext = newMb->pTail;
 		newMb->pTail->pNext = newMb->pHead;
-		
+		newMb->pTail->pPrevious = newMb->pHead;
 		
 		
 		return newMb;
@@ -68,14 +103,13 @@ exception send_wait(mailbox* mBox, void* pData){
 	if (firstrun){
 		firstrun = FALSE;
 		if (mBox->nBlockedMsg < 0 && mBox->pHead->pNext != mBox->pTail) {
-			memcpy(mBox->pHead->pNext->pData, pData, mBox->nDataSize);
-			listobj *recieving_task;
-			recieving_task = mBox->pHead->pNext->pBlock;
-			remove_message(mBox->pHead->pNext);
-			extract_waitinglist(recieving_task);
-			insert_waiting_ready_list(g_readylist,recieving_task);
+			msg* reciever = pop_mailbox(mBox);
+			memcpy(reciever->pData, pData, mBox->nDataSize);
+			
+			
+			extract_waitinglist(reciever->pBlock);
+			insert_waiting_ready_list(g_readylist,reciever->pBlock);
 			mBox->nBlockedMsg++;
-			mBox->nMessages--;
 		}
 		
 		else{
@@ -84,18 +118,29 @@ exception send_wait(mailbox* mBox, void* pData){
 				free(message);
 				return FAIL;
 			}
-			message->pData = pData;
-			message->pNext = mBox->pTail;
-			message->pPrevious = mBox->pTail->pPrevious;
-			message->pBlock = g_readylist->pHead->pNext;
-			mBox->pTail->pPrevious->pNext = message;
-			mBox->pTail->pPrevious = message;
-
+			message->pData = malloc(mBox->nDataSize);
+			if(message->pData == NULL){
+			
+				return FAIL;
+			}
+			
+			memcpy(message->pData, pData, mBox->nDataSize);
+			exception push_status = push_mailbox(mBox, message);
+			
+			if(push_status == FAIL){
+				
+				return push_status;
+			
+			}
+			
+			
 			listobj *sending_task;
 			sending_task = extract_readylist();
 			insert_waiting_ready_list(g_waitinglist, sending_task);
-			mBox->nMessages++;
-			mBox->nBlockedMsg--;
+			
+			message->pBlock = sending_task;
+			sending_task->pMessage = message;
+			mBox->nBlockedMsg++;
 		}
 		LoadContext();
 	}
@@ -104,9 +149,15 @@ exception send_wait(mailbox* mBox, void* pData){
 		
 		if(g_waitinglist->pHead->pNext->pTask->DeadLine <= TC){
 			isr_off();
-			remove_message(mBox->pHead->pNext);
+
+			g_readylist->pHead->pNext->pMessage->pNext->pPrevious = g_readylist->pHead->pNext->pMessage->pPrevious;
+			g_readylist->pHead->pNext->pMessage->pPrevious->pNext = g_readylist->pHead->pNext->pMessage->pNext;
+			
+			free(g_readylist->pHead->pNext->pMessage->pData);
+			free(g_readylist->pHead->pNext->pMessage);
+						
 			mBox->nMessages--;
-			mBox->nBlockedMsg++;
+			mBox->nBlockedMsg--;
 			isr_on();
 			return DEADLINE_REACHED;
 		}
@@ -165,12 +216,22 @@ exception recieve_wait(mailbox *mBox, void *data){
 	else{
 		if(g_waitinglist->pHead->pNext->pTask->DeadLine <= TC){
 			isr_off();
-			remove_message(mBox->pHead->pNext);
+			
+			g_readylist->pHead->pNext->pMessage->pNext->pPrevious = g_readylist->pHead->pNext->pMessage->pPrevious;
+			g_readylist->pHead->pNext->pMessage->pPrevious->pNext = g_readylist->pHead->pNext->pMessage->pNext;
+			
+			free(g_readylist->pHead->pNext->pMessage->pData);
+			free(g_readylist->pHead->pNext->pMessage);
+			
 			mBox->nMessages--;
-			mBox->nBlockedMsg++;
+			mBox->nBlockedMsg--;
+			
+			
+			isr_on();
 			return DEADLINE_REACHED;
 		
 		}
+		
 		else{
 			return OK;
 		}

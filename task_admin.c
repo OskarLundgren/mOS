@@ -10,31 +10,56 @@
 #include "timing.h"
 #include "main.h"
 
+
+bool State = INIT;
+
+
+void idle(){
+
+	for(;;);
+	
+}
+
 exception init_kernel(void){
     set_ticks(0);
-
-	
 	g_readylist = create_list();
 	
 	if(g_readylist == NULL){
 	
+		free(g_readylist);
 		return FAIL;
 	}
 	
     g_timerlist = create_list();
 	
 	if(g_timerlist == NULL){
+		free(g_readylist);
+		free(g_timerlist);
 		return FAIL;
 	}
 	
     g_waitinglist = create_list();
 	
 	if(g_waitinglist == NULL){
-		
+		free(g_readylist);
+		free(g_timerlist);
+		free(g_waitinglist);
 		return FAIL;
 	}
 	
+	exception status = create_task(&idle, 0);
 	
+	if(status != OK){
+		
+		free(g_readylist);
+		free(g_timerlist);
+		free(g_waitinglist);
+		
+		return status;
+		
+	
+	}
+	State = INIT;
 	return OK;
 		
     
@@ -93,7 +118,7 @@ void run(void){
 	//Timer0_Start();
 	
 	
-	g_running_mode = TRUE;
+	State = RUNNING;
 	isr_on();
 	LoadContext();
 }
@@ -107,7 +132,6 @@ void terminate(void){
 
 	remove_object = extract_readylist();
 
-	remove_object = extract_readylist();
 
 	free(remove_object);
 	LoadContext();

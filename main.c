@@ -13,6 +13,8 @@
 
 int g_running_mode = FALSE;
 int g_firstrun = TRUE;
+TCB *running = NULL;
+
 
 int main(void) {
     TC = 0;

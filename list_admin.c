@@ -125,4 +125,25 @@ listobj* extract_readylist(void){
     }
 }
 
+void delete_list(list **target){
+	
+	listobj *temp = (*target)->pHead;
+	
+	while(temp->pNext != (*target)->pTail){
+	
+		temp = temp->pNext;
+		
+		free(temp->pPrevious);
+		
+	}
+	
+	free((*target)->pTail);
+	free(*target);
+	*target = NULL;
+	
+	
+	
+	
+}
+
 
