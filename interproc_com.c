@@ -155,7 +155,7 @@ exception send_wait(mailbox* mBox, void* pData){
 			
 			free(g_readylist->pHead->pNext->pMessage->pData);
 			free(g_readylist->pHead->pNext->pMessage);
-						
+			
 			mBox->nMessages--;
 			mBox->nBlockedMsg--;
 			isr_on();
@@ -241,29 +241,6 @@ exception recieve_wait(mailbox *mBox, void *data){
 }
 
 
-
-exception send_no_wait(mailbox *mBox, void *data){
-	volatile int first_run = TRUE;
-	isr_off();
-	SaveContext();
-	
-	if(first_run){
-		first_run = FALSE;
-		
-		if(mBox->nMessages < 0 && mBox->pHead->pNext != mBox->pTail){
-			listobj *recieving_task;
-			memcpy(mBox->pHead->pNext->pData, data, mBox->nDataSize);
-			remove_message(mBox->pHead->pNext);
-			recieving_task = mBox->pHead->pNext->pBlock;
-			extract_waitinglist(recieving_task);
-			insert_waiting_ready_list(g_readylist, recieving_task);
-			
-		}
-	
-	}
-	
-}
-	
 
 
 
